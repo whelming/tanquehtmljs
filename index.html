@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+   <title>Document</title>
+   <style>
+      html, body {
+         padding: 0;
+         margin: 0;
+         width: 100%;
+         height: 100%;
+      }
+      body {
+         background-image: url(fondo.jpg);
+         background-size: cover;
+         overflow: hidden;
+      }
+      .tanks {
+         position: absolute;
+         filter: drop-shadow(0 0 4px rgba(0,0,0,1));
+         transition: .32s;
+      }
+      #tank1 {
+         left:150px;
+         top:299px;
+         z-index: 2;
+      }
+      .bala {
+         width: 6px;
+         height: 6px;
+         background: #fff;
+         position: absolute;
+         border-radius: 4px;
+         box-shadow: 0 0 6px 6px #4f6476;
+      }
+      #controls {
+         width: 100%;
+    height: 292px;
+    position: absolute;
+    bottom: 0;
+    z-index: 3;
+      }
+      .arrows {
+         position: fixed;
+    left: 2px;
+    bottom: 2px;
+    width: 280px;
+    height: 280px;
+    background: rgba(0, 0, 0, 0.65);
+    border-radius: 50%;
+    box-shadow: 0 0 22px 10px #769ad0c9;
+}
+
+      .arrows div {
+         position: absolute;
+         width: 112px;
+         height: 112px;
+         background: rgba(0, 0, 0, 0.52);
+         border-radius: 50%;
+         box-shadow: 0 0 15px 9px #769ad08f;
+      }
+      #top {
+         top: 0;
+    left: 85px;
+      }
+      #left {
+         top: 82px;
+    left: 0px;
+      }
+      #right {
+         top: 82px;
+    left: 171px;
+      }
+      #bot {
+         top: 167px;
+    left: 85px;
+      }
+
+      
+      #fire {
+         position: fixed;
+    right: 2px;
+    bottom: 2px;
+    width: 112px;
+    height: 112px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.62);
+    box-shadow: 0 0 28px 17px #f00;
+      }
+      #controls {
+         display: none; /* The width is 100%, when the viewport is 800px or smaller */
+      }
+      @media screen and (max-width: 800px) {
+      #controls {
+         display: block; /* The width is 100%, when the viewport is 800px or smaller */
+      }
+      }
+
+   </style>
+</head>
+<body>
+   <img id="tank1" class="tanks" src="tanquer.png">
+   <!-- <div class="bala"></div> -->
+   <div id="controls">
+      <div class="arrows">
+         <div id="top"></div>
+         <div id="left"></div>
+         <div id="right"></div>
+         <div id="bot"></div>
+      </div>
+      <div id="fire"></div>
+   </div>
+
+
+   <script>
+      function sleep(ms) {
+         return new Promise(resolve => setTimeout(resolve, ms));
+      }
+      function Tanque () {
+         this.div = '';
+         this.posX = 150;
+         this.posY = 300;
+         this.dir = "top"
+      }
+      var cantMov = 20;
+      var Tanque1 = new Tanque;
+      Tanque1.div = document.getElementById("tank1");
+
+      var MoverTanque = (tank) => {
+         if (tank.dir == "left"){
+            var moveX = tank.posX-20;
+            tank.posX = moveX;
+            tank.div.style.left = moveX+"px";
+         }
+         else if (tank.dir == "top"){
+            var moveY = tank.posY-20;
+            tank.posY = moveY;
+            tank.div.style.top = moveY+"px";
+         }
+         else if (tank.dir == "right"){
+            var moveX = tank.posX+20;
+            tank.posX = moveX;
+            tank.div.style.left = moveX+"px";
+         }
+         else if (tank.dir == "bot"){
+            var moveY = tank.posY+20;
+            tank.posY = moveY;
+            tank.div.style.top = moveY+"px";
+         }
+         
+         console.log("MOVER TANQUE");
+
+         return;
+         
+      }; 
+      var GiroTanque = (tank) => {
+         if (tank.dir == "left"){
+            tank.div.style.transform = "rotate(270deg)";
+         }
+         else if (tank.dir == "top"){
+            tank.div.style.transform = "rotate(0deg)";
+         }
+         else if (tank.dir == "right"){
+            tank.div.style.transform = "rotate(90deg)";
+         }
+         else if (tank.dir == "bot"){
+            tank.div.style.transform = "rotate(180deg)";
+         }
+         console.log("GIRO");
+         return;
+      }; 
+      var AnimarBala = async (bala, tank) => {
+         if (tank.dir == "left"){
+            for (let i = 0; i < 300; i++) {
+               var distanci = tank.posX+118 - i*5;
+               bala.style.left = distanci+"px";
+               await sleep(5);
+            }
+            await sleep(5);
+            bala.remove(); 
+         }
+         else if (tank.dir == "top"){
+            for (let i = 0; i < 300; i++) {
+               var distanci = tank.posY+118 - i*5;
+               bala.style.top = distanci+"px";
+               await sleep(5);
+            }
+            bala.remove(); 
+         }
+         else if (tank.dir == "right"){
+            for (let i = 0; i < 300; i++) {
+               var distanci = tank.posX+118 + i*5;
+               bala.style.left = distanci+"px";
+               await sleep(5);
+            }
+            bala.remove(); 
+         }
+         else if (tank.dir == "bot"){
+            for (let i = 0; i < 300; i++) {
+               var distanci = tank.posY+118 + i*5;
+               bala.style.top = distanci+"px";
+               await sleep(5);
+            }
+            bala.remove(); 
+         }
+         console.log("ANIMAR");
+         return;
+      }
+
+      var Disparo = (tank) => {
+         var newBala = document.createElement("div"); 
+         newBala.className = "bala";
+         newBala.style.left = tank.posX+118+"px";
+         newBala.style.top = tank.posY+118+"px";
+         document.body.appendChild(newBala);
+         AnimarBala(newBala, tank);
+         console.log("disparo");
+         return;
+      }; 
+
+     
+
+      document.addEventListener("keydown", function(event) {
+
+         var key = event.which;                
+            switch(key) {
+              case 37:
+              Tanque1.dir = "left";
+              GiroTanque(Tanque1);
+              MoverTanque(Tanque1);
+              console.log("left");
+                  break;
+              case 38:
+              Tanque1.dir = "top";
+              GiroTanque(Tanque1);
+              MoverTanque(Tanque1);
+               console.log("top");
+                  break;
+              case 39:
+              Tanque1.dir = "right";
+              GiroTanque(Tanque1);
+              MoverTanque(Tanque1);
+              console.log("right");
+                  break;
+              case 40:
+              Tanque1.dir = "bot";
+              GiroTanque(Tanque1);
+              MoverTanque(Tanque1);
+              console.log("bot");
+                  break;
+              case 32:
+              console.log("space");
+              Disparo(Tanque1);
+                  break;
+        }   
+      })
+
+      var topp = document.getElementById("top");
+      var rightt = document.getElementById("right");
+      var leftt = document.getElementById("left");
+      var bott = document.getElementById("bot");
+
+      var firer = document.getElementById("fire");
+
+
+      topp.onclick = function(){
+         Tanque1.dir = "top";
+         GiroTanque(Tanque1);
+         MoverTanque(Tanque1);
+      };
+      rightt.onclick = function(){
+         Tanque1.dir = "right";
+         GiroTanque(Tanque1);
+         MoverTanque(Tanque1);         
+      };
+      leftt.onclick = function(){
+         Tanque1.dir = "left";
+         GiroTanque(Tanque1);
+         MoverTanque(Tanque1);
+      };
+      bott.onclick = function(){
+         Tanque1.dir = "bot";
+         GiroTanque(Tanque1);
+         MoverTanque(Tanque1);
+      };
+      firer.onclick = function(){
+         Disparo(Tanque1);
+      };
+
+   </script>
+</body>
+</html>
